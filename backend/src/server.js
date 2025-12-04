@@ -2,15 +2,37 @@ import express from 'express';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+import path from 'path';
 
 dotenv.config();
 
 const app = express();
+// we need to configure some thing to be able to deploy on sevalla
+const __dirname = path.resolve(); // to get the current directory's absolute path
 
 const port = process.env.PORT || 3000;   
 // lets use the auth, this is an application level middleware
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
+
+if (process.env.NODE_ENV === 'production') {
+  // In production, after you build your React frontend (npm run build), 
+  // it creates a dist folder with optimized files. This code tells your Express
+  // server to serve those files directly, allowing users to access your frontend
+  // through the same server (no need for separate servers). In development, you 
+  // typically run the frontend separately with its own dev server.
+
+  // When you use app.use(express.static(path)), Express automatically looks for
+  //  matching files in that folder before checking your route handlers.
+  // Request: GET /styles.css -> express checks /frontend/dist/styles.css
+  // Request: GET /api/auth/login (doesn't match a file)
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+  // any other route, we will serve index.html
+  app.get('*', (_, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
+}
 
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
