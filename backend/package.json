@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prebuild": "npm run build --prefix ../frontend",
     "start": "node src/server.js"
   },
   "keywords": [],

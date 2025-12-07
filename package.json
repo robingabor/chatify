@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build --prefix frontend",
-    "start": "npm start --prefix backend"
+    "build": "npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "node backend/src/server.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
