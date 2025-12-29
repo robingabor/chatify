@@ -40,10 +40,10 @@ export const signup = async (req, res) => {
             password: hashedPassword
         });
         if(newUser) {
+            // save the user to the database
+            await newUser.save();            
             // autenticate the user
             generateToken(newUser.P_id, res);
-            // save the user to the database
-            await newUser.save();
             // 201 means something is created
             res.status(201).json({
                 _id: newUser._id,
@@ -51,7 +51,8 @@ export const signup = async (req, res) => {
                 email: newUser.email,
                 profilePic: newUser.profilePic
             });
-            // send a welcome email to the userP
+            // send a welcome email to the user
+
         }else {
             return res.status(400).json({ message: 'Invalid user data' });
         }

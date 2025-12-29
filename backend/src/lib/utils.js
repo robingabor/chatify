@@ -3,7 +3,11 @@ import jwt from 'jsonwebtoken';
 // jwt is used to generate tokens for user authentication
 // hey you are authenticated, just keep this token with you
 export const generateToken = (userId, res) => {
-    const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+    const { JWT_SECRET, NODE_ENV } = process.env;
+    if(!JWT_SECRET) {
+        throw new Error('JWT_SECRET is not set in environment variables');
+    }
+    const token = jwt.sign({ userId }, JWT_SECRET, {
         expiresIn: '7d' // token will expire in 7 days
     });    
     // res is needed to send the generated jwt token
@@ -15,7 +19,7 @@ export const generateToken = (userId, res) => {
         // in production, cookies should only be sent over HTTPS
         // http://localhost:3000 -> false
         // https://myapp.com -> true
-        secure: process.env.NODE_ENV === "production"
+        secure: NODE_ENV === "production"
     });
     
     return token;
