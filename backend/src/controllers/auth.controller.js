@@ -43,7 +43,7 @@ export const signup = async (req, res) => {
             // save the user to the database
             await newUser.save();            
             // autenticate the user
-            generateToken(newUser.P_id, res);
+            generateToken(newUser._id, res);
             // 201 means something is created
             res.status(201).json({
                 _id: newUser._id,
