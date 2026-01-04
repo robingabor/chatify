@@ -1,6 +1,9 @@
 import {User} from '../models/User.js';
 import bcrypt  from 'bcryptjs';
 import { generateToken } from '../lib/utils.js';
+import {ENV} from '../lib/env.js';
+import { sendWelcomeEmail } from '../emails/emailHandlers.js';
+
 export const signup = async (req, res) => {
     // we want to get the data the user sent via req.body
     // without using a middleware like express.json(), req.body will be undefined
@@ -47,11 +50,16 @@ export const signup = async (req, res) => {
             // 201 means something is created
             res.status(201).json({
                 _id: newUser._id,
-                fullName: newUser.fullName, 
+                fullName: newUser.fullName,
                 email: newUser.email,
                 profilePic: newUser.profilePic
             });
             // send a welcome email to the user
+            try {
+                await sendWelcomeEmail(newUser.email, newUser.fullName, ENV.CLIENT_URL);
+            } catch (emailError) {
+                console.error('Failed to send welcome email', emailError);
+            }
 
         }else {
             return res.status(400).json({ message: 'Invalid user data' });

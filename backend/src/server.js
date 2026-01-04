@@ -1,17 +1,16 @@
 import express from 'express';
-import dotenv from 'dotenv';
-import authRoutes from './routes/auth.route.js';
-import messageRoutes from './routes/message.route.js';
-import path from 'path';
-import { connectDB } from './lib/db.js';
 
-dotenv.config();
+import path from 'path';
+import authRoutes from "./routes/auth.route.js";
+import messageRoutes from "./routes/message.route.js";
+import { connectDB } from './lib/db.js';
+import { ENV } from "./lib/env.js";
 
 const app = express();
 // we need to configure some thing to be able to deploy on sevalla
 const __dirname = path.resolve(); // to get the current directory's absolute path
 
-const port = process.env.PORT || 3000;   
+const port = ENV.PORT || 3000;   
 
 app.use(express.json()); // to parse JSON request bodies (req.body)
 // we can get the fields the user sends
@@ -19,7 +18,7 @@ app.use(express.json()); // to parse JSON request bodies (req.body)
 app.use('/api/auth', authRoutes);
 app.use('/api/messages', messageRoutes);
 
-if (process.env.NODE_ENV === 'production') {
+if (ENV.NODE_ENV === 'production') {
   // In production, after you build your React frontend (npm run build), 
   // it creates a dist folder with optimized files. This code tells your Express
   // server to serve those files directly, allowing users to access your frontend
