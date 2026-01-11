@@ -47,7 +47,7 @@ if (ENV.NODE_ENV === 'production') {
 //     console.error('Failed to connect to the database:', err);
 //     process.exit(1); // Exit the process with failure
 //   });
-server.listen(PORT, async () => {
-  console.log("Server running on port: " + PORT);
+app.listen(port, async () => {
+  console.log("Server running on port: " + port);
   await connectDB();
 });
