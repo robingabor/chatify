@@ -10,3 +10,12 @@ export const ENV = {
     EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME,
     CLIENT_URL: process.env.CLIENT_URL
 };
+
+    const requiredInProd = ['MONGO_URI', 'JWT_SECRET', 'RESEND_API_KEY', 'EMAIL_FROM'];
+// Fail fast in production if essential env variables are missing
+if (ENV.NODE_ENV === 'production') {
+    const missingVars = requiredInProd.filter(varName => !ENV[varName]);
+    if (missingVars.length > 0) {
+        throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+    }
+}

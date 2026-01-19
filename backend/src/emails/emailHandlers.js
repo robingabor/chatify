@@ -21,8 +21,4 @@ export const sendWelcomeEmail = async (email, name, clientURL) => {
     }
 
     console.log('Welcome email sent successfully:', data);
-        
-        
-
-    
 }

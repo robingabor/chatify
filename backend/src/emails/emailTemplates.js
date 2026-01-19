@@ -1,4 +1,19 @@
 export function createWelcomeEmailTemplate(name, clientURL) {
+  // lets escape interpolation values and quote hrefs to prevent HTML injection
+  const escapeHTML = (str) => {
+    return String(str).replace(/[&<>"'`]/g, function(c) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '`': '&#x60;'
+      }[c];
+    });
+  };
+  name = escapeHTML(name ?? "");
+  clientURL = escapeHTML(clientURL ?? "");
   return `
   <!DOCTYPE html>
   <html lang="en">
