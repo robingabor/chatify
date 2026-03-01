@@ -43,6 +43,17 @@ export const sendMessage = async (req, res) => {
     const senderId = req.user._id;
     const { userId: receiverId } = req.params;
 
+    if (!text && !image) {
+      return res.status(400).json({ message: "Message text or image is required" });
+    }
+    if(receiverId === senderId.toString()) {
+      return res.status(400).json({ message: "You cant send a message to yourself" });
+    }
+    const receiverExists = await User.exists({ _id: receiverId });
+    if (!receiverExists) {
+      return res.status(404).json({ message: "Receiver user not found" });
+    }
+
     let imageUrl;
     if (image) {
       const uploadedImage = await cloudi.uploader.upload(image);
@@ -59,7 +70,7 @@ export const sendMessage = async (req, res) => {
     await newMessage.save();
 
     // todo: send message in real time using socket.io, if the user is online
-    
+
     res.status(201).json(newMessage);
   } catch (error) {
     console.log("Error in sendMessage:", error);

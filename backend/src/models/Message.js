@@ -20,6 +20,8 @@ const messageSchema = new mongoose.Schema({
     // a message can be either a text or a image, cant be both
     text: {
         type: String,
+        trim: true,
+        maxlength: 2000
     },
     image: {
         type: String,
