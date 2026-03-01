@@ -37,17 +37,6 @@ if (ENV.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
-
-// connectDB()
-//   .then(() => {
-//     app.listen(port, () => {
-//       console.log(`Server is running on ${port}`);
-//     });
-//   })
-//   .catch((err) => {
-//     console.error('Failed to connect to the database:', err);
-//     process.exit(1); // Exit the process with failure
-//   });
 app.listen(port, async () => {
   console.log("Server running on port: " + port);
   await connectDB();
