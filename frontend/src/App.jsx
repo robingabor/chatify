@@ -8,14 +8,11 @@ import PageLoader from './components/PageLoader'
 import { Toaster } from 'react-hot-toast'
 
 export default function App() {
-  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+   const { checkAuth, isCheckingAuth, authUser } = useAuthStore();
 
   useEffect(() => {
-    // this runs on: page load/ refresh
-    // and also when checkAuth function changes
-    // if we have authUser in the state, then we are authenticated
     checkAuth();
-  }, [checkAuth])
+  }, [checkAuth]);
 
   if (isCheckingAuth) return <PageLoader />;
 
@@ -27,13 +24,12 @@ export default function App() {
       <div className="absolute bottom-0 -right-4 size-96 bg-cyan-500 opacity-20 blur-[100px]" />
 
        {/* ROUTES */}      
-      <Routes>
-        {/* Define your routes here */}
-        <Route path="/" element={authUser ? <ChatPage /> : <Navigate to="/login" />} />
-        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
-        <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />
+       <Routes>
+        <Route path="/" element={authUser ? <ChatPage /> : <Navigate to={"/login"} />} />
+        <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
+        <Route path="/signup" element={!authUser ? <SignUpPage /> : <Navigate to={"/"} />} />
       </Routes>
-      {/* END OF ROUTES */}
+
       <Toaster />
     </div>
   )
