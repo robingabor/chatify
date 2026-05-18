@@ -6,7 +6,7 @@ export const useChatStore = create((set, get) => ({
     allContacts: [],
     // our chat partners
     chats: [],
-    // the messages of the currently active chat
+    // the messages of the current chat with the selected user
     messages: [],
     // activeTab is for the UI, to know which tab is active, contacts or chats
     activeTab: "chats",
@@ -14,12 +14,11 @@ export const useChatStore = create((set, get) => ({
     selectedUser: null, 
     isUsersLoading: false,
     isMessagesLoading: false,
-    isSoundEnabled: localStorage.getItem("isSoundEnabled") === true,
+    isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
 
     toggleSound: () => {
-        const isSoundEnabled = !get().isSoundEnabled;
-        localStorage.setItem("isSound,Enabled", isSoundEnabled);
-        set({ isSoundEnabled });
+        localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
+        set({ isSoundEnabled: !get().isSoundEnabled });
     },
     setActiveTab: (tab) => set({ activeTab: tab }),
     setSelectedUser: (user) => set({ selectedUser: user }),
@@ -36,6 +35,7 @@ export const useChatStore = create((set, get) => ({
             set({ isUsersLoading: false });
         }
     },
+    // users we have chatted with
     getMyChatPartners: async () => {
         set({ isUsersLoading: true });
         try {

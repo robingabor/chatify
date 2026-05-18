@@ -110,28 +110,24 @@ export const logout = (_, res) => {
     res.status(200).json({ message: 'Logged out successfully' });
 };
 
-export const updateProfile = async (req, res) => {    
-    try {
-        const { fullName, profilePic } = req.body; 
-        if(!profilePic){
-            return res.status(400).json({ message: 'Profile picture is required' });
-        }
-        // assuming req.user is populated by auth middleware, protectRoute
-        const userId = req.user._id;
+export const updateProfile = async (req, res) => {
+  try {
+    const { profilePic } = req.body;
+    if (!profilePic) return res.status(400).json({ message: "Profile pic is required" });
 
-        // upload the profilePic to cloudinary
-        const uploadResponse = await cloudi.uploader.upload(profilePic);
-        // we also want to update the database
-        const updatedUser = await User.findByIdAndUpdate(
-            userId, 
-            { profilePic: uploadResponse.secure_url
-        }, { new: true }); // new: true returns the updated user object
-        res.status(200).json({
-            updatedUser
-        });
+    const userId = req.user._id;
 
-    } catch (error) {
-        console.log('Error during profile update:', error);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-};      
+    const uploadResponse = await cloudi.uploader.upload(profilePic);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic: uploadResponse.secure_url },
+      { new: true }
+    );
+
+    res.status(200).json({ user: updatedUser });
+  } catch (error) {
+    console.log("Error in update profile:", error.message || error);
+    res.status(500).json({ message: error.message || "Failed to upload profile" });
+  }
+};

@@ -13,9 +13,10 @@ const __dirname = path.resolve(); // to get the current directory's absolute pat
 
 const port = ENV.PORT || 3000;   
 
-app.use(express.json()); // to parse JSON request bodies (req.body)
-// allow frontend to send cookies to our backend
+// allow frontend to send cookies to our backend - must be before express.json()
 app.use(cors({origin:ENV.CLIENT_URL, credentials:true}))
+app.use(express.json({ limit: '50mb' })); // to parse JSON request bodies (req.body) with increased limit for image uploads
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser()); // to parse cookies from incoming requests
 // we can get the fields the user sends
 // lets use the auth, this is an application level middleware
