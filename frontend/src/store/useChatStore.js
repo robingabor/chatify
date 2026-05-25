@@ -57,7 +57,7 @@ export const useChatStore = create((set, get) => ({
             set({ messages: response.data });
         } catch (error) {
             console.error("Error fetching messages:", error);
-            toast.error(error.response?.data?.message || "Failed to fetch messages");
+            toast.error(error?.response?.data?.message || "Failed to fetch messages");
         } finally {
             set({ isMessagesLoading: false });
         }

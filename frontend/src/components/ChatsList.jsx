@@ -16,7 +16,6 @@ function ChatsList() {
   if (isUsersLoading) return <UsersLoadingSkeleton />;
 
   if (chats.length === 0) return <NoChatsFound />;
-  console.log(chats);
 
   return (
     <>
@@ -27,7 +26,7 @@ function ChatsList() {
           onClick={()=> setSelectedUser(chat)}
         >
           <div className="flex items-center gap-3">
-            {/* TODO: Lets implement socket */}
+            {/* TODO: Make online status work, lets implement socket */}
             <div className={`avatar online`}>
               <div className="size-12 rounded-full">
                 <img src={chat.profilePic || "/avatar.png"} alt={chat.fullName} />
