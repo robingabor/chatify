@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import ChatHeader from './ChatHeader';
 import MessagesLoadingSkeleton from './MessagesLoadingSkeleton';
+import MessageInput from './MessageInput';
 
 function ChatContainer() {
     const { isMessagesLoading, getMessagesByUserId, selectedUser , messages } = useChatStore();
@@ -51,7 +52,7 @@ function ChatContainer() {
                 </div>
               </div>
             ))}
-            {/* 👇 scroll target */}
+            {/* scroll target */}
             <div ref={messageEndRef} />
           </div>
         ) : isMessagesLoading ? (
@@ -61,7 +62,7 @@ function ChatContainer() {
         )}
       </div>
 
-      {/* <MessageInput /> */}
+      <MessageInput />
     </>
   );
 }
