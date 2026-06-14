@@ -6,8 +6,8 @@ import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { connectDB } from './lib/db.js';
 import { ENV } from "./lib/env.js";
+import { app, server } from "./lib/socket.js"; // Import the Express app from socket.js
 
-const app = express();
 // we need to configure some thing to be able to deploy on sevalla
 const __dirname = path.resolve(); // to get the current directory's absolute path
 
@@ -41,7 +41,7 @@ if (ENV.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
-app.listen(port, async () => {
+server.listen(port, async () => {
   console.log("Server running on port: " + port);
   await connectDB();
 });
