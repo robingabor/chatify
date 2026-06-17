@@ -8,20 +8,36 @@ import MessagesLoadingSkeleton from './MessagesLoadingSkeleton';
 import MessageInput from './MessageInput';
 
 function ChatContainer() {
-    const { isMessagesLoading, getMessagesByUserId, selectedUser , messages } = useChatStore();
+    const { 
+      isMessagesLoading,
+      getMessagesByUserId,
+      selectedUser,
+      messages, 
+      subscribeToNewMessages,
+      unsubscribeFromNewMessages
+    } = useChatStore();
     const { authUser } = useAuthStore();
     const messageEndRef = React.useRef(null);
 
     useEffect(()=> {
-        getMessagesByUserId(selectedUser._id);
-    }, [selectedUser?._id, getMessagesByUserId]);
+      // fetch the messages
+      getMessagesByUserId(selectedUser._id);
+      // subscribe to new messages when the component mounts
+      subscribeToNewMessages();
+      // cleanup
+      // unsubscribe from new messages when the component unmounts
+      return () => {
+        unsubscribeFromNewMessages();
+      }
+    }, [selectedUser, getMessagesByUserId, subscribeToNewMessages, unsubscribeFromNewMessages]);
     
     useEffect(() => {
     if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
- return (
+
+  return (
     <>
       <ChatHeader />
       <div className="flex-1 px-6 overflow-y-auto py-8">

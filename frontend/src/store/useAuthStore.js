@@ -92,8 +92,9 @@ export const useAuthStore = create((set, get) => ({
     },
     connectSocket: () => {
         const {authUser} = get();
-        // if we are already connected or there is not auth user
-        if(!authUser || get().socket?.connected) return;
+        const existingSocket = get().socket;
+        // prevent duplicate socket connections if the user is already connected or if the socket is active(connecting)
+        if(!authUser || (existingSocket && (existingSocket.connected || existingSocket.active))) return;
 
         const socket = io(BASE_URL, {        
             withCredentials: true, // to send cookies with the socket connection
@@ -109,10 +110,13 @@ export const useAuthStore = create((set, get) => ({
         });
         },
         disconnectSocket: () => {
-            if(get().socket.connected){
-                get().socket?.disconnect();
-                set({ socket: null, onlineUsers: [] });
-            }
+            const socket = get().socket;
+            if (!socket) return;
+            // remove the event listener for online users
+            socket.off('getOnlineUsers');
+            socket.disconnect();
+            // reset the reference to the socket and online users
+            set({ socket: null, onlineUsers: [] });            
         }
 
 })) 

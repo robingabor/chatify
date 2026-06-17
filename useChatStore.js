@@ -3,6 +3,8 @@ import { axiosInstance } from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useAuthStore } from './useAuthStore';
 
+const notificationSound = new Audio("/sounds/notification.mp3");
+
 export const useChatStore = create((set, get) => ({
     allContacts: [],
     // our chat partners
@@ -100,16 +102,12 @@ export const useChatStore = create((set, get) => ({
         if (!socket) return;
         // listen for new messages from the socket server
         socket.on('newMessage', (message) => {
-            const isMessageSentFromSelectedUser = message.senderId === selectedUser._id;
-            if (!isMessageSentFromSelectedUser) return;
-
             const currentMessages = get().messages;
             
                 // update: keep the existing messages and add the new message to the end
                 set({ messages: [...currentMessages, message] });
                 // play a sound when a new message is received
                 if (isSoundEnabled) {
-                    const notificationSound = new Audio("/sounds/notification.mp3");
                     notificationSound.currentTime = 0; // reset the notificationSound to the start
                     notificationSound.play().catch((error) => {
                         console.error("Error playing notification sound:", error);
