@@ -1,6 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from 'cors'
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
@@ -9,7 +10,8 @@ import { ENV } from "./lib/env.js";
 import { app, server } from "./lib/socket.js"; // Import the Express app from socket.js
 
 // we need to configure some thing to be able to deploy on sevalla
-const __dirname = path.resolve(); // to get the current directory's absolute path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const port = ENV.PORT || 3000;   
 
@@ -34,11 +36,11 @@ if (ENV.NODE_ENV === 'production') {
   //  matching files in that folder before checking your route handlers.
   // Request: GET /styles.css -> express checks /frontend/dist/styles.css
   // Request: GET /api/auth/login (doesn't match a file)
-  app.use(express.static(path.join(__dirname, "frontend/dist")));
+  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
 
   // any other route, we will serve index.html
   app.get('*', (_, res) => {
-    res.sendFile(path.join(__dirname, "frontend/dist/index.html"));
+    res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
   });
 }
 server.listen(port, async () => {
