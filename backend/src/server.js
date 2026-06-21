@@ -34,11 +34,11 @@ if (ENV.NODE_ENV === 'production') {
   //  matching files in that folder before checking your route handlers.
   // Request: GET /styles.css -> express checks /frontend/dist/styles.css
   // Request: GET /api/auth/login (doesn't match a file)
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
   // any other route, we will serve index.html
   app.get('*', (_, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+    res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
   });
 }
 server.listen(port, async () => {
