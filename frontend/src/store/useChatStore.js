@@ -16,6 +16,8 @@ export const useChatStore = create((set, get) => ({
     isUsersLoading: false,
     isMessagesLoading: false,
     isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
+    // Polling interval reference
+    pollingInterval: null,
 
     toggleSound: () => {
         localStorage.setItem("isSoundEnabled", !get().isSoundEnabled);
@@ -51,16 +53,18 @@ export const useChatStore = create((set, get) => ({
             set({ isUsersLoading: false });
         }
     },
-    getMessagesByUserId: async (userId) => {
-        set({ isMessagesLoading: true });
+    getMessagesByUserId: async (userId, { showLoading = true } = {}) => {
+        // showLoading: whether to toggle the `isMessagesLoading` flag.
+        // When polling in background, set showLoading=false to avoid UI flicker.
+        if (showLoading) set({ isMessagesLoading: true });
         try {
             const response = await axiosInstance.get(`/messages/${userId}`);
             set({ messages: response.data });
         } catch (error) {
             console.error("Error fetching messages:", error);
-            toast.error(error?.response?.data?.message || "Failed to fetch messages");
+            if (showLoading) toast.error(error?.response?.data?.message || "Failed to fetch messages");
         } finally {
-            set({ isMessagesLoading: false });
+            if (showLoading) set({ isMessagesLoading: false });
         }
     },
     sendMessage: async (messageData) => {
@@ -91,37 +95,31 @@ export const useChatStore = create((set, get) => ({
             toast.error(error?.response?.data?.message || "Something went wrong");
         }
     },
-    // lets listen to any incoming messages from the socket server
-    subscribeToNewMessages: () => {
+    // REST API Polling: fetch messages periodically instead of using Socket.io
+    startPollingMessages: () => {
         const { selectedUser, isSoundEnabled } = get();
         if (!selectedUser) return;
 
-        const socket = useAuthStore.getState().socket;
-        if (!socket) return;
-        // listen for new messages from the socket server
-        socket.on('newMessage', (message) => {
-            const isMessageSentFromSelectedUser = message.senderId === selectedUser._id;
-            if (!isMessageSentFromSelectedUser) return;
+        // Clear existing interval if any
+        if (get().pollingInterval) {
+            clearInterval(get().pollingInterval);
+        }
 
-            const currentMessages = get().messages;
-            
-                // update: keep the existing messages and add the new message to the end
-                set({ messages: [...currentMessages, message] });
-                // play a sound when a new message is received
-                if (isSoundEnabled) {
-                    const notificationSound = new Audio("/sounds/notification.mp3");
-                    notificationSound.currentTime = 0; // reset the notificationSound to the start
-                    notificationSound.play().catch((error) => {
-                        console.error("Error playing notification sound:", error);
-                });
-            }            
-        });
+        // Fetch immediately (show loading on initial switch)
+        get().getMessagesByUserId(selectedUser._id, { showLoading: true });
+
+        // Set up polling interval (every 2 seconds) without showing loading
+        const interval = setInterval(() => {
+            get().getMessagesByUserId(selectedUser._id, { showLoading: false });
+        }, 2000);
+
+        set({ pollingInterval: interval });
     },
-    unsubscribeFromNewMessages: () => {
-        const socket = useAuthStore.getState().socket;
-        if (!socket) return;
-        // remove the listener for new messages when the 
-        // component unmounts or when we switch to another chat
-        socket.off('newMessage');
+    stopPollingMessages: () => {
+        const { pollingInterval } = get();
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+            set({ pollingInterval: null });
+        }
     }
 }));       

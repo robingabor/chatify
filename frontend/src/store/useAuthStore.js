@@ -1,13 +1,11 @@
 import { create } from 'zustand'
 import { axiosInstance } from '../lib/axios';
 import { toast } from 'react-hot-toast';
-import {io} from "socket.io-client"
+
 // if we want to create a state in react, we should use useState hook
 // but if we want to create a global state that can be accessed from any component, 
 // we should use a state management library like Redux or Zustand. 
 // In this case, we will use Zustand to create a global state for authentication.
-
-const BASE_URL = import.meta.env.MODE === "developement" ? "http://localhost:3000" : "/"; 
 
 export const useAuthStore = create((set, get) => ({
     // set is for updating the state
@@ -16,16 +14,12 @@ export const useAuthStore = create((set, get) => ({
     isCheckingAuth: true,    
     isSigningUp: false,
     isLoggingIn: false,
-    socket: null,
-    onlineUsers: [],
 
     checkAuth: async () => {
         try {
             const response = await axiosInstance.get('/auth/check-auth');
             // the response going to have a user object if the user is authenticated
             set({ authUser: response.data});
-            // connect to the socket server when the user is authenticated
-            get().connectSocket();
         } catch (error) {
             console.error("Error checking auth:", error);
             set({ authUser: null});
@@ -41,8 +35,6 @@ export const useAuthStore = create((set, get) => ({
             const response = await axiosInstance.post('/auth/signup', formData);
             const data = response.data;
             set({ authUser: data.user });
-            // connect to the socket server when the user signs up
-            get().connectSocket();
             // show a success message to the user, with fancy toast notification
             toast.success("Account created successfully!");
         } catch (error) {
@@ -59,8 +51,6 @@ export const useAuthStore = create((set, get) => ({
             const response = await axiosInstance.post('/auth/login', formData);
             const data = response.data;
             set({ authUser: data.user });
-            // connect to the socket server when the user logs in
-            get().connectSocket();
             toast.success("Logged in successfully!");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to login");
@@ -72,8 +62,6 @@ export const useAuthStore = create((set, get) => ({
         try {
             await axiosInstance.post('/auth/logout');
             set({ authUser: null });
-            // disconnect from the socket server when the user logs out
-            get().disconnectSocket();
             toast.success("Logged out successfully!");
         } catch (error) {
             toast.error("Failed to logout");
@@ -89,34 +77,5 @@ export const useAuthStore = create((set, get) => ({
             console.error("Profile update error:", error);
             toast.error(error.response?.data?.message || "Failed to update profile");
         }
-    },
-    connectSocket: () => {
-        const {authUser} = get();
-        const existingSocket = get().socket;
-        // prevent duplicate socket connections if the user is already connected or if the socket is active(connecting)
-        if(!authUser || (existingSocket && (existingSocket.connected || existingSocket.active))) return;
-
-        const socket = io(BASE_URL, {        
-            withCredentials: true, // to send cookies with the socket connection
-        });
-        // connect  to the socket server, and we want to send the token in the cookie for authentication
-        socket.connect();
-
-        set({ socket : socket });
-
-        // Listen for the 'getOnlineUsers' event from the backend to update the online users list
-        socket.on('getOnlineUsers', (userIds) => {
-            set({ onlineUsers: userIds });
-        });
-        },
-        disconnectSocket: () => {
-            const socket = get().socket;
-            if (!socket) return;
-            // remove the event listener for online users
-            socket.off('getOnlineUsers');
-            socket.disconnect();
-            // reset the reference to the socket and online users
-            set({ socket: null, onlineUsers: [] });            
-        }
-
-})) 
+    }
+}))

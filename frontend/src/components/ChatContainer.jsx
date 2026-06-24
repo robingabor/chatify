@@ -13,23 +13,22 @@ function ChatContainer() {
       getMessagesByUserId,
       selectedUser,
       messages, 
-      subscribeToNewMessages,
-      unsubscribeFromNewMessages
+      startPollingMessages,
+      stopPollingMessages
     } = useChatStore();
     const { authUser } = useAuthStore();
     const messageEndRef = React.useRef(null);
 
     useEffect(()=> {
-      // fetch the messages
-      getMessagesByUserId(selectedUser._id);
-      // subscribe to new messages when the component mounts
-      subscribeToNewMessages();
+      // fetch the messages (show loading on chat switch)
+      getMessagesByUserId(selectedUser._id, { showLoading: true });
+      // start polling for new messages every 2 seconds (polling won't show loading)
+      startPollingMessages();
       // cleanup
-      // unsubscribe from new messages when the component unmounts
       return () => {
-        unsubscribeFromNewMessages();
+        stopPollingMessages();
       }
-    }, [selectedUser, getMessagesByUserId, subscribeToNewMessages, unsubscribeFromNewMessages]);
+    }, [selectedUser, getMessagesByUserId, startPollingMessages, stopPollingMessages]);
     
     useEffect(() => {
     if (messageEndRef.current) {
