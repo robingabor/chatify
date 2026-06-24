@@ -1,6 +1,6 @@
 import React from 'react'
 import { useChatStore } from '../store/useChatStore';
-import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder";
+import NoChatHistoryPlaceHolder from "./NoChatHistoryPlaceHolder";
 import { useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import ChatHeader from './ChatHeader';
