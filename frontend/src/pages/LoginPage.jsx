@@ -1,16 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router";
 import { useAuthStore } from "../store/useAuthStore";
 import BorderAnimatedContainer from "../components/BorderAnimatedContainer";
 import { MessageCircleIcon, MailIcon, LoaderIcon, LockIcon } from "lucide-react";
-import { Link } from "react-router";
 
 function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const { login, isLoggingIn } = useAuthStore();
+  const { login, isLoggingIn, authUser } = useAuthStore();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  // Navigate when authUser changes (after successful login)
+  useEffect(() => {
+    if (authUser) {
+      console.log("authUser changed, navigating to /");
+      navigate("/");
+    }
+  }, [authUser, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(formData);
+    await login(formData);
   };
 
   return (

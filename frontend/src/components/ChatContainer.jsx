@@ -73,7 +73,7 @@ function ChatContainer() {
         ) : isMessagesLoading ? (
           <MessagesLoadingSkeleton />
         ) : (
-          <NoChatHistoryPlaceholder name={selectedUser.fullName} />
+          <NoChatHistoryPlaceHolder name={selectedUser.fullName} />
         )}
       </div>
 

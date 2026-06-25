@@ -9,7 +9,7 @@
     "build": "node copy-frontend.js"
   },
   "keywords": [],
-  "type": "module",
+  "type": "module",   
   "author": "",
   "license": "ISC",
   "dependencies": {

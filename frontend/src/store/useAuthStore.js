@@ -33,14 +33,15 @@ export const useAuthStore = create((set, get) => ({
         set({ isSigningUp: true });
         try {
             const response = await axiosInstance.post('/auth/signup', formData);
-            const data = response.data;
-            set({ authUser: data.user });
+            set({ authUser: response.data });
             // show a success message to the user, with fancy toast notification
             toast.success("Account created successfully!");
+            return true;
         } catch (error) {
             // if the error is from the backend, it will have a response object with a message
             // lets accest the error.response from axios and show the message to the user
             toast.error(error.response?.data?.message || "Failed to create account");
+            return false;
         } finally {
             set({ isSigningUp: false });
         }
@@ -49,11 +50,12 @@ export const useAuthStore = create((set, get) => ({
         set({ isLoggingIn: true });
         try {
             const response = await axiosInstance.post('/auth/login', formData);
-            const data = response.data;
-            set({ authUser: data.user });
+            set({ authUser: response.data });
             toast.success("Logged in successfully!");
+            return true;
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to login");
+            return false;
         } finally {
             set({ isLoggingIn: false });
         }
